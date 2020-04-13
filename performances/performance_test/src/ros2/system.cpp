@@ -41,11 +41,13 @@ void performance_test::System::add_node(std::shared_ptr<Node> node)
         auto& ex = it->second;
         ex.executor->add_node(node);
         ex.name = ex.name + "_" + node->get_name();
+        ex.executor->add_publisher_tasks(node->get_publishers_callbacks());
     } else {
         auto ex = NamedExecutor();
         ex.executor = std::make_shared<rclcpp::executors::StaticSingleThreadedExecutor>();
         ex.executor->add_node(node);
         ex.name = node->get_name();
+        ex.executor->add_publisher_tasks(node->get_publishers_callbacks());
 
         _executors_map.insert(std::make_pair(executor_id, ex));
     }
@@ -82,7 +84,7 @@ void performance_test::System::spin(int duration_sec, bool wait_for_discovery)
 
         // Spin each executor in a separate thread
         std::thread thread([=](){
-            executor->spin();
+            executor->intra_process_spin();
         });
         pthread_setname_np(thread.native_handle(), name.c_str());
         thread.detach();

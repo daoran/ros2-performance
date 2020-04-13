@@ -119,7 +119,14 @@ public:
       period
     );
 
-    this->add_timer(period, publisher_task);
+    _callbacks.emplace_back(publisher_task, period);
+  }
+
+
+  std::vector<std::pair<std::function<void()>, std::chrono::microseconds>>
+  get_publishers_callbacks()
+  {
+    return _callbacks;
   }
 
 
@@ -431,6 +438,10 @@ private:
     RCLCPP_DEBUG(this->get_logger(), "Request on %s request number %d received %lu us", name.c_str(), request->header.tracking_number, tracker.last());
   }
 
+  typedef std::function<void()> FunctorT;
+  typedef std::chrono::microseconds PeriodT;
+
+  std::vector<std::pair<FunctorT, PeriodT>> _callbacks;
 
   // A topic-name indexed map to store the publisher pointers with their
   // trackers.
