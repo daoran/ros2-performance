@@ -104,7 +104,7 @@ void performance_test::System::spin(int duration_sec, bool wait_for_discovery)
         std::thread thread([=](){
             executor->spin();
         });
-        pthread_setname_np(thread.native_handle(), name.c_str());
+        //pthread_setname_np(thread.native_handle(), name.c_str());
         thread.detach();
     }
 
