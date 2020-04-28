@@ -14,6 +14,7 @@
 
 #include "performance_test/ros2/node.hpp"
 #include "performance_test/ros2/events_logger.hpp"
+#include "performance_test/ros2/wall_timer.hpp"
 
 namespace performance_test {
 
@@ -33,6 +34,8 @@ public:
   void add_node(std::vector<std::shared_ptr<Node>> nodes);
 
   void add_node(std::shared_ptr<Node> node);
+
+  void create_timers();
 
   void spin(int duration_sec, bool wait_for_discovery = true);
 
@@ -60,6 +63,19 @@ private:
   void log_latency_all_stats(std::ostream& stream) const;
   void log_latency_total_stats(std::ostream& stream) const;
 
+  template<typename DurationRepT, typename DurationT, typename CallbackT>
+  std::shared_ptr<WallTimer<CallbackT>>
+  create_std_wall_timer(
+    CallbackT callback,
+    std::chrono::duration<DurationRepT, DurationT> period)
+  {
+    auto timer = std::make_shared<WallTimer<CallbackT>>(
+      std::chrono::duration_cast<PeriodT>(period),
+      std::move(callback)
+      );
+    return timer;
+  }
+
   std::chrono::high_resolution_clock::time_point _start_time;
 
   int _experiment_duration_sec;
@@ -68,6 +84,11 @@ private:
 
   std::map<int, NamedExecutor> _executors_map;
 
+  typedef std::function<void()> FunctorT;
+  typedef std::shared_ptr<WallTimer<FunctorT>> WallTimerSharedPtr;
+  typedef std::chrono::microseconds PeriodT;
+
+  std::map<PeriodT, WallTimerSharedPtr> _timers_map;
 
   std::shared_ptr<EventsLogger> _events_logger;
 

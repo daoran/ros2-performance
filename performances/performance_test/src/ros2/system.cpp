@@ -54,6 +54,26 @@ void performance_test::System::add_node(std::shared_ptr<Node> node)
 }
 
 
+void performance_test::System::create_timers()
+{
+    // Gather node callbacks with same period under same timer
+    for (const auto& node : _nodes){
+        for (const auto& callback : node->get_publishers_callbacks()){
+            auto period = callback.second;
+            //Look for existing timers with that period
+            auto timer_it = _timers_map.find(period);
+            if (timer_it != _timers_map.end()) {
+                // There's a timer with that period, add callback to it
+                timer_it->second->add_callback(std::move(callback.first));
+            } else {
+                // There's not a timer with that period, create one and add callback
+                auto timer = this->create_std_wall_timer(std::move(callback.first), period);
+                _timers_map[period] = timer;
+            }
+        }
+    }
+}
+
 void performance_test::System::spin(int duration_sec, bool wait_for_discovery)
 {
     _experiment_duration_sec = duration_sec;
@@ -86,6 +106,15 @@ void performance_test::System::spin(int duration_sec, bool wait_for_discovery)
         });
         pthread_setname_np(thread.native_handle(), name.c_str());
         thread.detach();
+    }
+
+    create_timers();
+
+    // Start the publisher timers
+    auto timer_it = _timers_map.begin();
+    while (timer_it != _timers_map.end())
+    {
+        timer_it++->second->start();
     }
 
     // let the nodes spin for the specified amount of time

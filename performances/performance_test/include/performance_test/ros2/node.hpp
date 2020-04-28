@@ -119,7 +119,13 @@ public:
       period
     );
 
-    this->add_timer(period, publisher_task);
+     _callbacks.emplace_back(publisher_task, period);
+   }
+
+  std::vector<std::pair<std::function<void()>, std::chrono::microseconds>>
+  get_publishers_callbacks()
+  {
+    return _callbacks;
   }
 
 
@@ -202,8 +208,6 @@ public:
   void add_timer(std::chrono::microseconds period, std::function<void()> callback)
   {
     rclcpp::TimerBase::SharedPtr timer = this->create_wall_timer(period, callback);
-
-    _timers.push_back(timer);
 
   }
 
@@ -432,6 +436,11 @@ private:
   }
 
 
+  typedef std::function<void()> FunctorT;
+  typedef std::chrono::microseconds PeriodT;
+
+  std::vector<std::pair<FunctorT, PeriodT>> _callbacks;
+
   // A topic-name indexed map to store the publisher pointers with their
   // trackers.
   std::map<std::string, std::pair<std::shared_ptr<void>, Tracker::TrackingNumber>> _pubs;
@@ -448,11 +457,8 @@ private:
   // trackers.
   std::map<std::string, std::pair<std::shared_ptr<void>, Tracker>> _servers;
 
-
-  std::vector<rclcpp::TimerBase::SharedPtr> _timers;
-
   std::shared_ptr<EventsLogger> _events_logger;
 
   int m_executor_id = 0;
 };
-}
+} // namespace performance_test
