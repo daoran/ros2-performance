@@ -13,7 +13,6 @@ endif()
 find_package(ament_cmake REQUIRED)
 
 find_package(rosidl_default_generators REQUIRED)
-find_package(performance_test_plugin_cmake REQUIRED)
 find_package(performance_test_msgs REQUIRED)
 
 find_package(std_msgs REQUIRED)
@@ -48,9 +47,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   ${CUSTOM_SRVS}
   DEPENDENCIES std_msgs performance_test_msgs
 )
-
-
-generate_factory_plugin("${CUSTOM_MSGS}" "${CUSTOM_SRVS}")
 
 ament_export_dependencies(rosidl_default_runtime)
 

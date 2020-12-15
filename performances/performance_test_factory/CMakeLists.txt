@@ -15,6 +15,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rcpputils REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(performance_test REQUIRED)
+find_package(irobot_interfaces_plugin REQUIRED)
 
 include_directories(
   include
@@ -25,6 +26,7 @@ set (LIBRARY_DEPENDENCIES
   rcpputils
   rclcpp
   performance_test
+  irobot_interfaces_plugin
 )
 
 set(LIBRARY_SRC
