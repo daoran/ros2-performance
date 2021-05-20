@@ -17,7 +17,6 @@
 
 #include "performance_test/ros2/names_utilities.hpp"
 #include "performance_test/ros2/node.hpp"
-#include "performance_test/ros2/lifecycle_node.hpp"
 #include "performance_test/ros2/executors.hpp"
 #include "performance_test/ros2/events_logger.hpp"
 

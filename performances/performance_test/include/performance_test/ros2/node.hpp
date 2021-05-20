@@ -20,6 +20,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/qos.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 
 #include "performance_test/ros2/communication.hpp"
 #include "performance_test/ros2/tracker.hpp"
@@ -29,22 +30,31 @@ using namespace std::chrono_literals;
 
 namespace performance_test {
 
-class Node : public rclcpp::Node
+template <typename NodeT = rclcpp::Node>
+class Node : public NodeT
 {
 
 template <typename> friend class System;
+
+// The alias PublisherT will resolve to rclcpp::Publisher or to rclcpp_lifecycle::LifecyclePublisher
+// depending on the type of NodeT
+typedef typename std::conditional<
+    std::is_same<NodeT, rclcpp::Node>::value,
+    rclcpp::Publisher,
+    rclcpp_lifecycle::LifecyclePublisher
+    >::type PublisherT;
 
 public:
 
   Node(const std::string& name, const std::string& ros2_namespace = "",
       const rclcpp::NodeOptions& node_options = rclcpp::NodeOptions(), int executor_id = 0)
-    : rclcpp::Node(name, ros2_namespace, node_options)
+    : NodeT(name, ros2_namespace, node_options)
   {
     m_executor_id = executor_id;
-
+    //configure();
+    //activate();
     RCLCPP_INFO(this->get_logger(), "Node %s created with executor id %d", name.c_str(), m_executor_id);
   }
-
 
   template <typename Msg>
   void add_subscriber(const Topic<Msg>& topic,
@@ -121,10 +131,12 @@ public:
   template <typename Msg>
   void add_publisher(const Topic<Msg>& topic, rmw_qos_profile_t qos_profile = rmw_qos_profile_default)
   {
-
-    typename rclcpp::Publisher<Msg>::SharedPtr pub =
+    typename PublisherT<Msg>::SharedPtr pub =
                                       this->create_publisher<Msg>(topic.name,
                                       rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(qos_profile), qos_profile));
+
+    //pub->on_activate();
+    //activate_publisher(pub);
 
     auto tracking_options = Tracker::TrackingOptions();
     _pubs.insert({ topic.name, { pub, Tracker(this->get_name(), topic.name, tracking_options) } });
@@ -132,6 +144,23 @@ public:
     RCLCPP_INFO(this->get_logger(),"Publisher to %s created", topic.name.c_str());
   }
 
+  /*
+  template <typename PubT>
+  typename std::enable_if<
+    (std::is_same<NodeT, rclcpp::Node>::value), void>::type
+  activate_publisher(PubT pub)
+  {
+    (void)pub;
+  }
+
+  template <typename PubT>
+  typename std::enable_if<
+    (std::is_same<NodeT, rclcpp_lifecycle::LifecycleNode>::value), void>::type
+  activate_publisher(PubT pub)
+  {
+    pub->on_activate();
+  }
+  */
 
   template <typename Srv>
   void add_server(const Service<Srv>& service, rmw_qos_profile_t qos_profile = rmw_qos_profile_default)
