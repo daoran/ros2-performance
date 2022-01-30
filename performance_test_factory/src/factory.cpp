@@ -36,7 +36,12 @@ TemplateFactory::TemplateFactory(
   bool verbose_mode,
   const std::string & ros2_namespace,
   NodeType node_type)
+<<<<<<< HEAD
 : _use_ipc(use_ipc),
+=======
+:
+  _use_ipc(use_ipc),
+>>>>>>> fix linter errors
   _use_ros_params(use_ros_params),
   _verbose_mode(verbose_mode),
   _ros2_namespace(ros2_namespace),
@@ -254,7 +259,11 @@ void TemplateFactory::add_subscriber_from_strings(
   std::string _msg_type = msg_type;
   auto library = performance_test::get_library(_msg_type);
 
+<<<<<<< HEAD
   typedef void (* function_impl_t)(
+=======
+  typedef void (*function_impl_t)(
+>>>>>>> fix linter errors
     PerformanceNodeBase::SharedPtr,
     const std::string &,
     const std::string &,
@@ -285,7 +294,11 @@ void TemplateFactory::add_periodic_publisher_from_strings(
   std::string _msg_type = msg_type;
   auto library = performance_test::get_library(_msg_type);
 
+<<<<<<< HEAD
   typedef void (* function_impl_t)(
+=======
+  typedef void (*function_impl_t)(
+>>>>>>> fix linter errors
     PerformanceNodeBase::SharedPtr,
     const std::string &,
     const std::string &,
@@ -316,7 +329,11 @@ void TemplateFactory::add_periodic_client_from_strings(
   std::string _srv_type = srv_type;
   auto library = performance_test::get_library(_srv_type);
 
+<<<<<<< HEAD
   typedef void (* function_impl_t)(
+=======
+  typedef void (*function_impl_t)(
+>>>>>>> fix linter errors
     PerformanceNodeBase::SharedPtr,
     const std::string &,
     const std::string &,
@@ -342,7 +359,11 @@ void TemplateFactory::add_server_from_strings(
   std::string _srv_type = srv_type;
   auto library = performance_test::get_library(_srv_type);
 
+<<<<<<< HEAD
   typedef void (* function_impl_t)(
+=======
+  typedef void (*function_impl_t)(
+>>>>>>> fix linter errors
     PerformanceNodeBase::SharedPtr,
     const std::string &,
     const std::string &,
@@ -373,7 +394,11 @@ TemplateFactory::parse_topology_from_json(
 
   nlohmann::json j = nlohmann::json::parse(ifs);
   if (j.find("nodes") == j.end()) {
+<<<<<<< HEAD
     std::cout << "ERROR. The provided json does not contain a nodes field" << std::endl;
+=======
+    std::cout<<"ERROR. The provided json does not contain a nodes field"<< std::endl;
+>>>>>>> fix linter errors
     return nodes_vec;
   }
 
@@ -454,7 +479,11 @@ void TemplateFactory::create_node_entities_from_json(
   if (node_json.find("servers") != node_json.end()) {
     // if there is at least 1 server, add each of them
     for (auto s_json : node_json["servers"]) {
+<<<<<<< HEAD
       this->add_server_from_json(node, s_json);
+=======
+        this->add_server_from_json(node, s_json);
+>>>>>>> fix linter errors
     }
   }
 }
@@ -592,7 +621,11 @@ rmw_qos_profile_t TemplateFactory::get_qos_from_json(const nlohmann::json & enti
 
   std::map<std::string, rmw_qos_liveliness_policy_t> liveliness_qos_map{
     {"system_default", RMW_QOS_POLICY_LIVELINESS_SYSTEM_DEFAULT},
+<<<<<<< HEAD
     {"automatic", RMW_QOS_POLICY_LIVELINESS_AUTOMATIC},
+=======
+    {"automatic",RMW_QOS_POLICY_LIVELINESS_AUTOMATIC},
+>>>>>>> fix linter errors
     {"manual_by_topic", RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC},
     {"unknown", RMW_QOS_POLICY_LIVELINESS_UNKNOWN}
   };
